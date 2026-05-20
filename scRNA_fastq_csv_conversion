@@ -1,0 +1,26 @@
+import scanpy as sc
+import pandas as pd
+from scipy import sparse
+import os
+
+matrix_dir = "/Users/qiaoqiaowan/Desktop/python/scRNA-seq/PBMC_demo/filtered_feature_bc_matrix/"
+out_dir = "/Users/qiaoqiaowan/Desktop/python/scRNA-seq/PBMC_demo/filtered_feature_bc_matrix/"
+os.makedirs(out_dir, exist_ok=True)
+
+adata = sc.read_10x_mtx(
+    matrix_dir,
+    var_names="gene_symbols",
+    make_unique=True
+)
+
+# adata.X is cells × genes
+# Your GEO-style CSV is genes × cells, so transpose it
+counts_df = pd.DataFrame.sparse.from_spmatrix(
+    adata.X.T,
+    index=adata.var_names,
+    columns=adata.obs_names
+)
+
+counts_df.to_csv(
+    os.path.join(out_dir, "neutrophil_demo_raw_counts.csv")
+)
